@@ -44,6 +44,7 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 		attached = false
 	}
 
+	// TODO: 16.03.20 Think of creating of StoreProcessor for better performance.
 	fun launch() {
 
 		val inputActionsSource = inputActions.replay(1).refCount()
