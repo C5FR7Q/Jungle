@@ -18,7 +18,7 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 	private val sideEffectProcessor: ActionProcessor<InternalAction>? by lazy { createSideEffectProcessor() }
 
 	private val inputActions = PublishSubject.create<InputAction>()
-	private val states = BehaviorSubject.createDefault(reducer.internalState)
+	private val states = BehaviorSubject.createDefault(reducer.initialState)
 
 	private val lifeCycleSubscriptions = CompositeDisposable()
 	private val processActionsSubscriptions = CompositeDisposable()

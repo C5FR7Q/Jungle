@@ -16,7 +16,7 @@ class ExampleStore(
 	)
 
 	class ExampleReducer : Reducer<String> {
-		override val internalState = ""
+		val initialState = ""
 
 		override fun reduce(state: String, internalAction: Any): String {
 			return "a"
