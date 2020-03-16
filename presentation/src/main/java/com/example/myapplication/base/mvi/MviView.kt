@@ -1,5 +1,5 @@
 package com.example.myapplication.base.mvi
 
-interface View<State> {
+interface MviView<State> {
 	fun render(state: State)
 }

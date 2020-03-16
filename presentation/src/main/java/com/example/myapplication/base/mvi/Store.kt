@@ -42,7 +42,7 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 		}
 	}
 
-	fun attach(view: View<State>) {
+	fun attach(view: MviView<State>) {
 		lifeCycleSubscriptions.add(
 			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
 		)
