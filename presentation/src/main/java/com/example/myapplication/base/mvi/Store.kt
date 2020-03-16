@@ -9,12 +9,13 @@ import io.reactivex.subjects.PublishSubject
 abstract class Store<Event, InputAction, InternalAction, State>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val eventMapper: EventMapper<Event, InputAction>,
-	private val middlewareAssembler: MiddlewareAssembler<InputAction, InternalAction, State>,
-	private val reducer: Reducer<State, InternalAction>,
-	private val directActionProcessor: ActionProcessor<InputAction>? = null,
-	private val sideEffectProcessor: ActionProcessor<InternalAction>? = null
+	private val eventMapper: EventMapper<Event, InputAction>
 ) {
+
+	private val middlewareAssembler by lazy { createMiddlewareAssembler() }
+	private val reducer by lazy { createReducer() }
+	private val directActionProcessor: ActionProcessor<InputAction>? by lazy { createDirectActionProcessor() }
+	private val sideEffectProcessor: ActionProcessor<InternalAction>? by lazy { createSideEffectProcessor() }
 
 	private val inputActions = PublishSubject.create<InputAction>()
 	private val states = BehaviorSubject.createDefault(reducer.internalState)
@@ -23,6 +24,11 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 	private val processActionsSubscriptions = CompositeDisposable()
 
 	private var attached = false
+
+	protected abstract fun createMiddlewareAssembler(): MiddlewareAssembler<InputAction, InternalAction, State>
+	protected abstract fun createReducer(): Reducer<State, InternalAction>
+	protected open fun createDirectActionProcessor(): ActionProcessor<InputAction>? = null
+	protected open fun createSideEffectProcessor(): ActionProcessor<InternalAction>? = null
 
 	init {
 		launch()
