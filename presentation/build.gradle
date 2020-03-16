@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+	compileSdkVersion 29
+	buildToolsVersion "29.0.3"
+
+	defaultConfig {
+		applicationId "com.example.myapplication"
+		minSdkVersion 16
+		targetSdkVersion 29
+		versionCode 1
+		versionName "1.0"
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+
+}
+
+dependencies {
+	implementation project(":domain")
+	implementation project(":data")
+
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+	implementation "androidx.appcompat:appcompat:$androidxVersion"
+	implementation "androidx.core:core-ktx:$androidxVersion"
+	implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+	implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+
+	implementation "io.reactivex.rxjava2:rxandroid:$rxJavaVersion"
+	implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+	implementation "com.jakewharton.rxbinding2:rxbinding:$rxJavaVersion"
+
+	implementation "com.github.vivchar:RendererRecyclerViewAdapter:$rendererRecyclerViewAdapterVersion"
+
+	implementation "com.google.dagger:dagger:$daggerVersion"
+	implementation "com.google.dagger:dagger-android:$daggerVersion"
+	implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+
+	kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+	kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+}
