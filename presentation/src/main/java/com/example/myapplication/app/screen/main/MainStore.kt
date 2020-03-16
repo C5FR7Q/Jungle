@@ -17,7 +17,10 @@ class MainStore @Inject constructor(
 	eventMapper
 ) {
 
-	sealed class InputAction
+	sealed class InputAction {
+		object Load : InputAction()
+	}
+
 	sealed class InternalAction
 
 	override fun createMiddlewareAssembler(): MiddlewareAssembler<InputAction, InternalAction, MainState> {
