@@ -30,12 +30,16 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 
 	fun dispatchEvent(event: Observable<Event>) {
 		if (attached) {
-			lifeCycleSubscriptions.add(event.observeOn(foregroundScheduler).subscribe { inputActions.onNext(eventMapper.convert(it)) })
+			lifeCycleSubscriptions.add(
+				event.observeOn(foregroundScheduler).subscribe { inputActions.onNext(eventMapper.convert(it)) }
+			)
 		}
 	}
 
 	fun attach(view: View<State>) {
-		lifeCycleSubscriptions.add(states.observeOn(foregroundScheduler).subscribe { view.render(it) })
+		lifeCycleSubscriptions.add(
+			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
+		)
 		attached = true
 	}
 
@@ -67,8 +71,7 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 
 		val initialState = states.value!!
 		processActionsSubscriptions.add(
-			internalActionsSource
-				.scan(initialState, { state, internalAction -> reducer.reduce(state, internalAction) })
+			internalActionsSource.scan(initialState, { state, internalAction -> reducer.reduce(state, internalAction) })
 				.distinctUntilChanged()
 				.subscribe { states.onNext(it) }
 		)
