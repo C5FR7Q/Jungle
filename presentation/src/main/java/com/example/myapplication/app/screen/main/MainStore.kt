@@ -5,10 +5,12 @@ import com.example.myapplication.base.mvi.EventMapper
 import com.example.myapplication.base.mvi.MiddlewareAssembler
 import com.example.myapplication.base.mvi.Reducer
 import com.example.myapplication.base.mvi.Store
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import javax.inject.Inject
 
 class MainStore @Inject constructor(
+	private val countryMiddleware: CountryMiddleware,
 	foregroundScheduler: Scheduler,
 	backgroundScheduler: Scheduler,
 	eventMapper: EventMapper<MainEvent, InputAction>
@@ -28,8 +30,12 @@ class MainStore @Inject constructor(
 		data class Failed(val error: String) : InternalAction()
 	}
 
-	override fun createMiddlewareAssembler(): MiddlewareAssembler<InputAction, InternalAction, MainState> {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	override fun createMiddlewareAssembler() = object : MiddlewareAssembler<InputAction, InternalAction, MainState>() {
+		override fun Observable<InputAction>.splitByMiddleware(lastState: MainState): List<Observable<out InternalAction>> {
+			return listOf(
+				bind(countryMiddleware)
+			)
+		}
 	}
 
 	override fun createReducer(): Reducer<MainState, InternalAction> {
