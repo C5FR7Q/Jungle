@@ -19,8 +19,10 @@ class MainFragment : BaseFragment(), MviView<MainState> {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		main_recycler.layoutManager = LinearLayoutManager(requireContext())
-		main_recycler.adapter = MainAdapter()
+		main_recycler.apply {
+			layoutManager = LinearLayoutManager(requireContext())
+			adapter = MainAdapter()
+		}
 
 		mainStore.run {
 			attach(this@MainFragment)
