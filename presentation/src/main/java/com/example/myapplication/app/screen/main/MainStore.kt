@@ -38,7 +38,12 @@ class MainStore @Inject constructor(
 		}
 	}
 
-	override fun createReducer(): Reducer<MainState, InternalAction> {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	override fun createReducer(): Reducer<MainState, InternalAction> = object : Reducer<MainState, InternalAction> {
+		override val initialState = MainState()
+		override fun reduce(state: MainState, internalAction: InternalAction) = when (internalAction) {
+			is InternalAction.Loading -> state.copy(loading = true, errorMessage = "")
+			is InternalAction.Loaded -> state.copy(loading = false, countries = internalAction.countries)
+			is InternalAction.Failed -> state.copy(loading = false, errorMessage = internalAction.error)
+		}
 	}
 }
