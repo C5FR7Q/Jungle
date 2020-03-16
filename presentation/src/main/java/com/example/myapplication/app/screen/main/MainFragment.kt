@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.domain.country.CountryMiddleware
+import com.example.domain.country.GetCountriesInteractor
 import com.example.myapplication.R
 import com.example.myapplication.base.BaseFragment
 import com.jakewharton.rxbinding2.view.RxView
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class MainFragment : BaseFragment() {
 
 	@Inject
-	lateinit var countryMiddleware: CountryMiddleware
+	lateinit var getCountriesInteractor: GetCountriesInteractor
 
 	override val containerID = R.layout.fragment_main
 
@@ -32,7 +32,7 @@ class MainFragment : BaseFragment() {
 			RxView.clicks(main_load).map { MainEvent.Load }
 
 		val state: Observable<MainState> = uiEvents.flatMap {
-			countryMiddleware.countries.map<MainState> { MainState.Success(it) }
+			getCountriesInteractor.countries.map<MainState> { MainState.Success(it) }
 				.onErrorReturn { MainState.Fail(it.message ?: "No message of error") }
 				.observeOn(AndroidSchedulers.mainThread())
 				.startWith(MainState.Loading)
