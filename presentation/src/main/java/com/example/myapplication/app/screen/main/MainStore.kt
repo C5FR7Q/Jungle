@@ -1,5 +1,6 @@
 package com.example.myapplication.app.screen.main
 
+import com.example.domain.country.Country
 import com.example.myapplication.base.mvi.EventMapper
 import com.example.myapplication.base.mvi.MiddlewareAssembler
 import com.example.myapplication.base.mvi.Reducer
@@ -21,7 +22,11 @@ class MainStore @Inject constructor(
 		object Load : InputAction()
 	}
 
-	sealed class InternalAction
+	sealed class InternalAction {
+		object Loading : InternalAction()
+		data class Loaded(val countries: List<Country>) : InternalAction()
+		data class Failed(val error: String) : InternalAction()
+	}
 
 	override fun createMiddlewareAssembler(): MiddlewareAssembler<InputAction, InternalAction, MainState> {
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
