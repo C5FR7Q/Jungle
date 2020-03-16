@@ -2,6 +2,6 @@ package com.example.myapplication.base.mvi
 
 import io.reactivex.ObservableTransformer
 
-interface Middleware<Event, InternalAction> : ObservableTransformer<Event, InternalAction>
+interface Middleware<InputAction, InternalAction> : ObservableTransformer<InputAction, InternalAction>
 
-interface StateBasedMiddleware<Event, InternalAction, State> : Middleware<Pair<State, Event>, InternalAction>
+interface StateBasedMiddleware<InputAction, InternalAction, State> : Middleware<Pair<State, InputAction>, InternalAction>
