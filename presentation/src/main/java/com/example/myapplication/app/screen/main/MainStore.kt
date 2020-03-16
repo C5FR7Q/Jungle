@@ -1,23 +1,23 @@
 package com.example.myapplication.app.screen.main
 
 import com.example.domain.country.Country
-import com.example.myapplication.base.mvi.EventMapper
 import com.example.myapplication.base.mvi.MiddlewareAssembler
 import com.example.myapplication.base.mvi.Reducer
 import com.example.myapplication.base.mvi.Store
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import javax.inject.Inject
+import javax.inject.Named
 
 class MainStore @Inject constructor(
 	private val countryMiddleware: CountryMiddleware,
-	foregroundScheduler: Scheduler,
-	backgroundScheduler: Scheduler,
-	eventMapper: EventMapper<MainEvent, InputAction>
+	@Named("foregroundScheduler") foregroundScheduler: Scheduler,
+	@Named("backgroundScheduler") backgroundScheduler: Scheduler,
+	mainEventMapper: MainEventMapper
 ) : Store<MainEvent, MainStore.InputAction, MainStore.InternalAction, MainState>(
 	foregroundScheduler,
 	backgroundScheduler,
-	eventMapper
+	mainEventMapper
 ) {
 
 	sealed class InputAction {

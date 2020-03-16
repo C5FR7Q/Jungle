@@ -10,8 +10,12 @@ import com.example.myapplication.app.MainActivityModule
 import com.example.myapplication.di.inject.PerActivity
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import javax.inject.Named
 
 /**
  * Provides application-wide dependencies.
@@ -31,4 +35,18 @@ abstract class AppModule {
 
 	@Binds
 	abstract fun countryRepository(countryRepositoryImpl: CountryRepositoryImpl): CountryRepository
+
+	@Module
+	companion object {
+		@JvmStatic
+		@Provides
+		@Named("backgroundScheduler")
+		fun backgroundScheduler() = Schedulers.computation()
+
+		@JvmStatic
+		@Provides
+		@Named("foregroundScheduler")
+		fun foregroundScheduler() = AndroidSchedulers.mainThread()
+	}
+
 }
