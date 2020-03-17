@@ -1,3 +1,3 @@
 package com.example.myapplication.base.mvi.command
 
-sealed class Command
+abstract class Command
