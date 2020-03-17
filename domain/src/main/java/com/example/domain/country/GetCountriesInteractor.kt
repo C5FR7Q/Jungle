@@ -2,6 +2,6 @@ package com.example.domain.country
 
 import io.reactivex.Observable
 
-interface CountryMiddleware {
+interface GetCountriesInteractor {
 	val countries: Observable<List<Country>>
 }

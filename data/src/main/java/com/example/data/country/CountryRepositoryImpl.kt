@@ -6,6 +6,7 @@ import com.example.domain.country.Country
 import com.example.domain.country.CountryRepository
 import io.reactivex.Observable
 import javax.inject.Inject
+import kotlin.random.Random
 
 class CountryRepositoryImpl @Inject constructor() : CountryRepository, RetrofitApi<CountryApi> {
 
@@ -22,6 +23,6 @@ class CountryRepositoryImpl @Inject constructor() : CountryRepository, RetrofitA
 					.toList()
 					.toObservable()
 			}
-//			.map { if (Random.nextBoolean()) it else throw Exception("can't load") }
+			.map { if (Random.nextBoolean()) it else throw Exception("can't load") }
 			.subscribeOn(SCHEDULER)
 }
