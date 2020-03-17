@@ -1,6 +1,5 @@
 package com.example.myapplication.base.mvi.command
 
-import com.example.myapplication.base.mvi.Middleware
 import io.reactivex.Observable
 
 abstract class CommandExecutor {
