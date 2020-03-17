@@ -1,7 +1,7 @@
 package com.example.myapplication.base.mvi
 
+import com.example.myapplication.base.mvi.command.Command
+import com.example.myapplication.base.mvi.command.CommandResult
 import io.reactivex.ObservableTransformer
 
-interface Middleware<InputAction, InternalAction> : ObservableTransformer<InputAction, InternalAction>
-
-interface StateBasedMiddleware<InputAction, InternalAction, State> : Middleware<Pair<State, InputAction>, InternalAction>
+interface Middleware<C : Command, CR : CommandResult> : ObservableTransformer<C, CR>
