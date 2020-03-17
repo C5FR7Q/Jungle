@@ -67,11 +67,10 @@ abstract class Store<Event, State, Action>(
 			.refCount()
 */
 
-		actionProducer?.run {
+		if (actionProducer != null) {
 			processCommandsSubscriptions.add(
-				commandSource.subscribe {
-					// TODO: 18.03.20 Implement
-					actions.onNext(produce(it))
+				commandSource.subscribe { command ->
+					actionProducer.produce(command)?.let { actions.onNext(it) }
 				}
 			)
 		}
@@ -81,8 +80,8 @@ abstract class Store<Event, State, Action>(
 
 			if (commandProducer != null) {
 				processCommandsSubscriptions.add(
-					commandResultSource.subscribe {
-						commands.onNext(commandProducer.produce(it))
+					commandResultSource.subscribe { commandResult ->
+						commandProducer.produce(commandResult)?.let { commands.onNext(it) }
 					}
 				)
 			}
