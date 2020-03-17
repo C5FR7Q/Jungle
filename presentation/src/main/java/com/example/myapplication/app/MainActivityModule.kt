@@ -40,7 +40,7 @@ abstract class MainActivityModule {
 		@JvmStatic
 		@Provides
 		@PerActivity
-		fun mainRouter(mainActivity: MainActivity): MainRouter = MainRouter(mainActivity.supportFragmentManager)
+		fun mainRouter(mainActivity: MainActivity): MainRouter = MainRouter(mainActivity, mainActivity.supportFragmentManager)
 	}
 
 }

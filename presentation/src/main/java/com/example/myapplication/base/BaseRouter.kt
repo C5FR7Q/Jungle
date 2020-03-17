@@ -1,8 +1,10 @@
 package com.example.myapplication.base
 
+import android.content.Context
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 
-abstract class BaseRouter(private val fragmentManager: FragmentManager) {
+abstract class BaseRouter(private val context: Context, private val fragmentManager: FragmentManager) {
 	protected abstract val layoutResId: Int
 
 //	TODO: Make it private?
@@ -47,4 +49,11 @@ abstract class BaseRouter(private val fragmentManager: FragmentManager) {
 			return backStack
 		}
 
+
+
+
+
+	fun showToast(message: String) {
+		Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+	}
 }
