@@ -36,9 +36,9 @@ class MainFragment : BaseFragment(), MviView<MainState> {
 	}
 
 	override fun render(state: MainState) {
-		main_load.visibility = if (state.loading) View.GONE else View.VISIBLE
+		main_load.visibility = if (state.loading || state.countries.isNotEmpty()) View.GONE else View.VISIBLE
 		main_progress.visibility = if (!state.loading) View.GONE else View.VISIBLE
-		main_recycler.visibility = if (state.countries.isNotEmpty()) View.GONE else View.VISIBLE
+		main_recycler.visibility = if (state.countries.isNotEmpty()) View.VISIBLE else View.GONE
 		(main_recycler.adapter as? MainAdapter)?.let { adapter ->
 			adapter.setItems(state.countries.map { MainAdapter.MainModel(it.name) })
 			adapter.notifyDataSetChanged()
