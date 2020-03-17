@@ -1,6 +1,8 @@
 package com.example.myapplication.base.mvi
 
-interface Reducer<State, InternalAction> {
+import com.example.myapplication.base.mvi.command.CommandResult
+
+interface Reducer<State> {
 	val initialState: State
-	fun reduce(state: State, internalAction: InternalAction): State
+	fun reduce(state: State, commandResult: CommandResult): State
 }

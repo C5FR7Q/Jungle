@@ -1,50 +1,53 @@
 package com.example.myapplication.base.mvi
 
+import com.example.myapplication.base.mvi.command.Command
+import com.example.myapplication.base.mvi.command.CommandExecutor
+import com.example.myapplication.base.mvi.producer.ActionProducer
+import com.example.myapplication.base.mvi.producer.CommandProducer
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 
-abstract class Store<Event, InputAction, InternalAction, State>(
+abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val eventMapper: EventMapper<Event, InputAction>
+	private val eventMapper: EventMapper<Event>,
+	private val actionProducer: ActionProducer<Action>? = null,
+	private val commandExecutor: CommandExecutor? = null,
+	private val reducer: Reducer<State>? = null,
+	private val commandProducer: CommandProducer? = null
 ) {
 
-	private val middlewareAssembler by lazy { createMiddlewareAssembler() }
-	private val reducer by lazy { createReducer() }
-	private val directActionProcessor: ActionProcessor<InputAction>? by lazy { createDirectActionProcessor() }
-	private val sideEffectProcessor: ActionProcessor<InternalAction>? by lazy { createSideEffectProcessor() }
-
-	private val inputActions = PublishSubject.create<InputAction>()
-	private val states = BehaviorSubject.createDefault(reducer.initialState)
+	private val commands = PublishSubject.create<Command>()
+	private val states = BehaviorSubject.create<State>()
+	private val actions = PublishSubject.create<Action>()
 
 	private val lifeCycleSubscriptions = CompositeDisposable()
-	private val processActionsSubscriptions = CompositeDisposable()
+	private val processCommandsSubscriptions = CompositeDisposable()
 
 	private var attached = false
 
-	protected abstract fun createMiddlewareAssembler(): MiddlewareAssembler<InputAction, InternalAction, State>
-	protected abstract fun createReducer(): Reducer<State, InternalAction>
-	protected open fun createDirectActionProcessor(): ActionProcessor<InputAction>? = null
-	protected open fun createSideEffectProcessor(): ActionProcessor<InternalAction>? = null
-
 	init {
+		reducer?.let { states.onNext(it.initialState) }
 		launch()
 	}
 
 	fun dispatchEvent(event: Observable<Event>) {
 		if (attached) {
 			lifeCycleSubscriptions.add(
-				event.observeOn(foregroundScheduler).subscribe { inputActions.onNext(eventMapper.convert(it)) }
+				event.observeOn(foregroundScheduler).subscribe { commands.onNext(eventMapper.convert(it)) }
 			)
 		}
 	}
 
-	fun attach(view: MviView<State>) {
+	fun attach(view: MviView<State, Action>) {
 		lifeCycleSubscriptions.add(
 			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
+		)
+		lifeCycleSubscriptions.add(
+			actions.observeOn(foregroundScheduler).subscribe { view.processAction(it) }
 		)
 		attached = true
 	}
@@ -57,37 +60,45 @@ abstract class Store<Event, InputAction, InternalAction, State>(
 	// TODO: 16.03.20 Think of creating of StoreProcessor for better performance.
 	fun launch() {
 
-		val inputActionsSource = inputActions.replay(1).refCount()
-		val internalActionsSource = inputActionsSource.publish { middlewareAssembler.assembleMiddlewares(it, states.value!!) }
+		val commandSource = commands.subscribeOn(backgroundScheduler).replay(1).refCount()
+/*
+		val commandResultSource = commandSource.publish { middlewareAssembler.assembleMiddlewares(it, states.value!!) }
 			.replay(1)
 			.refCount()
-			.subscribeOn(backgroundScheduler)
+*/
 
-		directActionProcessor?.run {
-			processActionsSubscriptions.add(
-				inputActionsSource.observeOn(foregroundScheduler).subscribe { processAction(it) }
+		if (actionProducer != null) {
+			processCommandsSubscriptions.add(
+				commandSource.subscribe { command ->
+					actionProducer.produce(command)?.let { actions.onNext(it) }
+				}
 			)
 		}
 
-		sideEffectProcessor?.run {
-			processActionsSubscriptions.add(
-				internalActionsSource.observeOn(foregroundScheduler).subscribe { processAction(it) }
-			)
-		}
+		if (commandExecutor != null) {
+			val commandResultSource = commandExecutor.execute(commandSource).replay(1).refCount()
 
-		val initialState = states.value!!
-		processActionsSubscriptions.add(
-			internalActionsSource.scan(initialState, { state, internalAction -> reducer.reduce(state, internalAction) })
-				.distinctUntilChanged()
-				.subscribe { states.onNext(it) }
-		)
+			if (commandProducer != null) {
+				processCommandsSubscriptions.add(
+					commandResultSource.subscribe { commandResult ->
+						commandProducer.produce(commandResult)?.let { commands.onNext(it) }
+					}
+				)
+			}
+
+			if (reducer != null) {
+				val initialState = states.value!!
+				processCommandsSubscriptions.add(
+					commandResultSource.scan(initialState, { state, internalAction -> reducer.reduce(state, internalAction) })
+						.distinctUntilChanged()
+						.subscribe { states.onNext(it) }
+				)
+			}
+
+		}
 	}
 
 	fun finish() {
-		processActionsSubscriptions.dispose()
-	}
-
-	protected fun dispatchAction(inputAction: InputAction) {
-		inputActions.onNext(inputAction)
+		processCommandsSubscriptions.dispose()
 	}
 }

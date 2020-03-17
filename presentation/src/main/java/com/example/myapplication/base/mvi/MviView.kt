@@ -1,5 +1,6 @@
 package com.example.myapplication.base.mvi
 
-interface MviView<State> {
-	fun render(state: State)
+interface MviView<State, Action> {
+	fun render(state: State) {}
+	fun processAction(action: Action) {}
 }

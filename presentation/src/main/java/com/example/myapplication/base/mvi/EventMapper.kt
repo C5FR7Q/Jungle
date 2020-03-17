@@ -1,5 +1,7 @@
 package com.example.myapplication.base.mvi
 
-interface EventMapper<Event, InputAction> {
-	fun convert(event: Event): InputAction
+import com.example.myapplication.base.mvi.command.Command
+
+interface EventMapper<Event> {
+	fun convert(event: Event): Command
 }
