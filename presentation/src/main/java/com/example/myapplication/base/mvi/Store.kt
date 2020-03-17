@@ -76,7 +76,7 @@ abstract class Store<Event, State, Action>(
 		}
 
 		if (commandExecutor != null) {
-			val commandResultSource = commandSource.flatMap { commandExecutor.execute(it) }.replay(1).refCount()
+			val commandResultSource = commandExecutor.execute(commandSource).replay(1).refCount()
 
 			if (commandProducer != null) {
 				processCommandsSubscriptions.add(
