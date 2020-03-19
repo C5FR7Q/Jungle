@@ -15,7 +15,7 @@ abstract class Store<Event, State, Action>(
 	private val backgroundScheduler: Scheduler,
 	private val eventMapper: EventMapper<Event>,
 	private val actionProducer: ActionProducer<Action>? = null,
-	private val commandExecutor: CommandExecutor? = null,
+	private val commandExecutor: CommandExecutor<State>? = null,
 	private val reducer: Reducer<State>? = null,
 	private val commandProducer: CommandProducer? = null
 ) {
@@ -61,11 +61,6 @@ abstract class Store<Event, State, Action>(
 	fun launch() {
 
 		val commandSource = commands.subscribeOn(backgroundScheduler).replay(1).refCount()
-/*
-		val commandResultSource = commandSource.publish { middlewareAssembler.assembleMiddlewares(it, states.value!!) }
-			.replay(1)
-			.refCount()
-*/
 
 		if (actionProducer != null) {
 			processCommandsSubscriptions.add(
@@ -76,7 +71,7 @@ abstract class Store<Event, State, Action>(
 		}
 
 		if (commandExecutor != null) {
-			val commandResultSource = commandExecutor.execute(commandSource).replay(1).refCount()
+			val commandResultSource = commandExecutor.execute(commandSource, states).replay(1).refCount()
 
 			if (commandProducer != null) {
 				processCommandsSubscriptions.add(
