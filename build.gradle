@@ -8,6 +8,7 @@ buildscript {
 		recyclerViewVersion = '1.0.0'
 
 		rxJavaVersion = '2.1.1'
+		rxKotlinVersion = '2.4.0'
 		rendererRecyclerViewAdapterVersion = '2.8.0'
 		retrofitVersion = '2.1.0'
 		retrofitRxJavaAdapterVersion = "1.0.0"
