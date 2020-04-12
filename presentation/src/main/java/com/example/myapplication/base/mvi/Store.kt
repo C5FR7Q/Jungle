@@ -15,6 +15,7 @@ abstract class Store<Event, State, Action>(
 	private val backgroundScheduler: Scheduler,
 	private val eventMapper: EventMapper<Event>,
 	private val actionProducer: ActionProducer<Action>? = null,
+	private val bootstrapper: Bootstrapper? = null,
 	private val commandExecutor: CommandExecutor<State>? = null,
 	private val reducer: Reducer<State>? = null,
 	private val commandProducer: CommandProducer? = null
@@ -68,6 +69,10 @@ abstract class Store<Event, State, Action>(
 					actionProducer.produce(command)?.let { actions.onNext(it) }
 				}
 			)
+		}
+
+		bootstrapper?.bootstrapCommands?.forEach {
+			commands.onNext(it)
 		}
 
 		if (commandExecutor != null) {
