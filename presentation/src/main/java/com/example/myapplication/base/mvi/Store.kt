@@ -60,8 +60,14 @@ abstract class Store<Event, State, Action>(
 	}
 
 	fun launch() {
+		val bootstrapCommands = if (bootstrapper != null)
+			Observable.fromIterable(bootstrapper.bootstrapCommands) else
+			null
 
-		val commandSource = commands.subscribeOn(backgroundScheduler).replay(1).refCount()
+		val commandSource = commands.let { bootstrapCommands?.mergeWith(it) ?: it }
+			.subscribeOn(backgroundScheduler)
+			.replay(1)
+			.refCount()
 
 		if (actionProducer != null) {
 			processCommandsSubscriptions.add(
@@ -71,12 +77,10 @@ abstract class Store<Event, State, Action>(
 			)
 		}
 
-		bootstrapper?.bootstrapCommands?.forEach {
-			commands.onNext(it)
-		}
-
 		if (commandExecutor != null) {
-			val commandResultSource = commandExecutor.execute(commandSource, states).replay(1).refCount()
+			val commandResultSource = commandExecutor.execute(commandSource, states)
+				.replay(1)
+				.refCount()
 
 			if (commandProducer != null) {
 				processCommandsSubscriptions.add(
