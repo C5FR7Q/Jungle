@@ -31,7 +31,6 @@ abstract class Store<Event, State, Action>(
 
 	init {
 		reducer?.let { states.onNext(it.initialState) }
-		launch()
 	}
 
 	fun dispatchEvent(event: Observable<Event>) {
@@ -43,6 +42,7 @@ abstract class Store<Event, State, Action>(
 	}
 
 	fun attach(view: MviView<State, Action>) {
+		launch()
 		lifeCycleSubscriptions.add(
 			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
 		)
@@ -55,9 +55,9 @@ abstract class Store<Event, State, Action>(
 	fun detach() {
 		lifeCycleSubscriptions.dispose()
 		attached = false
+		finish()
 	}
 
-	// TODO: 16.03.20 Think of creating of StoreProcessor for better performance.
 	fun launch() {
 
 		val commandSource = commands.subscribeOn(backgroundScheduler).replay(1).refCount()
