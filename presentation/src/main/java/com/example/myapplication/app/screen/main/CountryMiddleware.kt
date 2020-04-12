@@ -1,19 +1,30 @@
 package com.example.myapplication.app.screen.main
 
+import com.example.domain.country.Country
 import com.example.domain.country.GetCountriesInteractor
-import com.example.myapplication.base.mvi.Middleware
+import com.example.myapplication.base.mvi.command.Command
+import com.example.myapplication.base.mvi.command.CommandResult
+import com.example.myapplication.base.mvi.command.Middleware
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import javax.inject.Inject
 
 class CountryMiddleware @Inject constructor(private val getCountriesInteractor: GetCountriesInteractor) :
-	Middleware<MainStore.InputAction.Load, MainStore.InternalAction> {
-	override fun apply(upstream: Observable<MainStore.InputAction.Load>): ObservableSource<MainStore.InternalAction> {
+	Middleware<CountryMiddleware.Input, CommandResult> {
+	override fun apply(upstream: Observable<Input>): ObservableSource<CommandResult> {
 		return upstream.switchMap {
 			getCountriesInteractor.countries
-				.map<MainStore.InternalAction> { MainStore.InternalAction.Loaded(it) }
-				.onErrorReturn { MainStore.InternalAction.Failed(it.message ?: "Can't load countries") }
-				.startWith(MainStore.InternalAction.Loading)
+				.map<Output> { Output.Loaded(it) }
+				.onErrorReturn { Output.Failed(it.message ?: "Can't load countries") }
+				.startWith(Output.Loading)
 		}
+	}
+
+	object Input : Command
+
+	sealed class Output : CommandResult {
+		object Loading : Output()
+		data class Loaded(val countries: List<Country>) : Output()
+		data class Failed(val error: String) : Output()
 	}
 }

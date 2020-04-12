@@ -2,15 +2,17 @@ package com.example.myapplication.app.screen.main
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.R
+import com.example.myapplication.app.screen.main.store.MainStore
 import com.example.myapplication.base.BaseFragment
 import com.example.myapplication.base.mvi.MviView
 import com.jakewharton.rxbinding2.view.RxView
 import kotlinx.android.synthetic.main.fragment_main.*
 import javax.inject.Inject
 
-class MainFragment : BaseFragment(), MviView<MainState> {
+class MainFragment : BaseFragment(), MviView<MainState, MainAction> {
 
 	override val containerID = R.layout.fragment_main
 
@@ -42,6 +44,12 @@ class MainFragment : BaseFragment(), MviView<MainState> {
 		(main_recycler.adapter as? MainAdapter)?.let { adapter ->
 			adapter.setItems(state.countries.map { MainAdapter.MainModel(it.name) })
 			adapter.notifyDataSetChanged()
+		}
+	}
+
+	override fun processAction(action: MainAction) {
+		when (action) {
+			is MainAction.ShowError -> Toast.makeText(requireContext(), action.error, Toast.LENGTH_SHORT).show()
 		}
 	}
 }
