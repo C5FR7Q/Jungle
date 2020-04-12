@@ -14,6 +14,7 @@ class MainStore @Inject constructor(
 	@Named("backgroundScheduler") backgroundScheduler: Scheduler,
 	eventMapper: MainEventMapper,
 	actionProducer: MainActionProducer,
+	bootstrapper: MainBootstrapper,
 	commandExecutor: MainCommandExecutor,
 	reducer: MainReducer,
 	commandProducer: MainCommandProducer
@@ -22,6 +23,7 @@ class MainStore @Inject constructor(
 	backgroundScheduler = backgroundScheduler,
 	eventMapper = eventMapper,
 	actionProducer = actionProducer,
+	bootstrapper = bootstrapper,
 	commandExecutor = commandExecutor,
 	reducer = reducer,
 	commandProducer = commandProducer
