@@ -18,11 +18,11 @@ class MainStore @Inject constructor(
 	reducer: MainReducer,
 	commandProducer: MainCommandProducer
 ) : Store<MainEvent, MainState, MainAction>(
-	foregroundScheduler,
-	backgroundScheduler,
-	eventMapper,
-	actionProducer,
-	commandExecutor,
-	reducer,
-	commandProducer
+	foregroundScheduler = foregroundScheduler,
+	backgroundScheduler = backgroundScheduler,
+	eventMapper = eventMapper,
+	actionProducer = actionProducer,
+	commandExecutor = commandExecutor,
+	reducer = reducer,
+	commandProducer = commandProducer
 )
