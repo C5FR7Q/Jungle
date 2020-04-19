@@ -1,4 +1,4 @@
-package com.example.myapplication.app.screen.main
+package com.example.myapplication.app.screen.demo.main
 
 import com.example.myapplication.base.mvi.EventMapper
 import javax.inject.Inject

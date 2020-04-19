@@ -1,7 +1,7 @@
 package com.example.myapplication.app
 
 import android.app.Activity
-import com.example.myapplication.app.screen.main.MainFragment
+import com.example.myapplication.app.screen.demo.main.MainFragment
 import com.example.myapplication.base.BaseActivityModule
 import com.example.myapplication.di.inject.PerActivity
 import com.example.myapplication.di.inject.PerFragment

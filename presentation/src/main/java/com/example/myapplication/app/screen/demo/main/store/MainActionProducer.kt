@@ -1,6 +1,6 @@
-package com.example.myapplication.app.screen.main.store
+package com.example.myapplication.app.screen.demo.main.store
 
-import com.example.myapplication.app.screen.main.MainAction
+import com.example.myapplication.app.screen.demo.main.MainAction
 import com.example.myapplication.base.mvi.command.Command
 import com.example.myapplication.base.mvi.producer.ActionProducer
 import javax.inject.Inject

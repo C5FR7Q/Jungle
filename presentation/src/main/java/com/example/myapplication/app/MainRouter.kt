@@ -3,7 +3,7 @@ package com.example.myapplication.app
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import com.example.myapplication.R
-import com.example.myapplication.app.screen.main.MainFragment
+import com.example.myapplication.app.screen.demo.main.MainFragment
 import com.example.myapplication.base.BaseRouter
 
 class MainRouter(context: Context, fragmentManager: FragmentManager) : BaseRouter(context, fragmentManager) {

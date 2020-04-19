@@ -1,11 +1,11 @@
-package com.example.myapplication.app.screen.main
+package com.example.myapplication.app.screen.demo.main
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.R
-import com.example.myapplication.app.screen.main.store.MainStore
+import com.example.myapplication.app.screen.demo.main.store.MainStore
 import com.example.myapplication.base.BaseFragment
 import com.example.myapplication.base.mvi.MviView
 import com.jakewharton.rxbinding2.view.RxView

@@ -1,7 +1,7 @@
-package com.example.myapplication.app.screen.main.store
+package com.example.myapplication.app.screen.demo.main.store
 
-import com.example.myapplication.app.screen.main.CountryMiddleware
-import com.example.myapplication.app.screen.main.MainState
+import com.example.myapplication.app.screen.demo.main.CountryMiddleware
+import com.example.myapplication.app.screen.demo.main.MainState
 import com.example.myapplication.base.mvi.Reducer
 import com.example.myapplication.base.mvi.command.CommandResult
 import javax.inject.Inject
