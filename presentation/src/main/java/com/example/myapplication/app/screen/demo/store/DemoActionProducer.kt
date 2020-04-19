@@ -1,13 +1,13 @@
-package com.example.myapplication.app.screen.demo.main.store
+package com.example.myapplication.app.screen.demo.store
 
-import com.example.myapplication.app.screen.demo.main.MainAction
+import com.example.myapplication.app.screen.demo.DemoAction
 import com.example.myapplication.base.mvi.command.Command
 import com.example.myapplication.base.mvi.producer.ActionProducer
 import javax.inject.Inject
 
-class MainActionProducer @Inject constructor() : ActionProducer<MainAction> {
+class DemoActionProducer @Inject constructor() : ActionProducer<DemoAction> {
 	override fun produce(input: Command) = when (input) {
-		is Input.Error -> MainAction.ShowError(input.error)
+		is Input.Error -> DemoAction.ShowError(input.error)
 		else -> null
 	}
 

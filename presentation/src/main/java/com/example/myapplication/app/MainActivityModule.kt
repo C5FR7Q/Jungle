@@ -1,7 +1,7 @@
 package com.example.myapplication.app
 
 import android.app.Activity
-import com.example.myapplication.app.screen.demo.main.MainFragment
+import com.example.myapplication.app.screen.demo.DemoFragment
 import com.example.myapplication.base.BaseActivityModule
 import com.example.myapplication.di.inject.PerActivity
 import com.example.myapplication.di.inject.PerFragment
@@ -14,8 +14,8 @@ import dagger.android.ContributesAndroidInjector
 abstract class MainActivityModule {
 
 	@PerFragment
-	@ContributesAndroidInjector/*(modules = [MainFragmentModule::class])*/
-	abstract fun mainFragmentInjector(): MainFragment
+	@ContributesAndroidInjector/*(modules = [DemoFragmentModule::class])*/
+	abstract fun demoFragmentInjector(): DemoFragment
 
 	/**
 	 * As per the contract specified in [BaseActivityModule]; "This must be included in all
@@ -29,7 +29,7 @@ abstract class MainActivityModule {
 	abstract fun activity(mainActivity: MainActivity): Activity
 
 	/**
-	 * The main activity listens to the events in the [MainFragment].
+	 * The main activity listens to the events in the [DemoFragment].
 	 *
 	 * @param mainActivity the activity
 	 * @return the main fragment listener

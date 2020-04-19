@@ -1,22 +1,22 @@
-package com.example.myapplication.app.screen.demo.main
+package com.example.myapplication.app.screen.demo
 
 import com.example.myapplication.R
 import com.github.vivchar.rendererrecyclerviewadapter.RendererRecyclerViewAdapter
 import com.github.vivchar.rendererrecyclerviewadapter.ViewModel
 import com.github.vivchar.rendererrecyclerviewadapter.binder.ViewBinder
 
-class MainAdapter : RendererRecyclerViewAdapter() {
+class DemoAdapter : RendererRecyclerViewAdapter() {
 	init {
 		registerRenderer(
-			ViewBinder<MainModel>(
-				R.layout.item_main,
-				MainModel::class.java,
+			ViewBinder<DemoModel>(
+				R.layout.item_demo,
+				DemoModel::class.java,
 				ViewBinder.Binder { model, finder, _ ->
-					finder.setText(R.id.main_item_text, model.name)
+					finder.setText(R.id.demo_item_text, model.name)
 				}
 			)
 		)
 	}
 
-	data class MainModel(val name: String) : ViewModel
+	data class DemoModel(val name: String) : ViewModel
 }

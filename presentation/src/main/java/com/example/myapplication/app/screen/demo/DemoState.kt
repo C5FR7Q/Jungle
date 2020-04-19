@@ -1,8 +1,8 @@
-package com.example.myapplication.app.screen.demo.main
+package com.example.myapplication.app.screen.demo
 
 import com.example.domain.country.Country
 
-data class MainState(
+data class DemoState(
 	val loading: Boolean = false,
 	val countries: List<Country> = emptyList()
 )

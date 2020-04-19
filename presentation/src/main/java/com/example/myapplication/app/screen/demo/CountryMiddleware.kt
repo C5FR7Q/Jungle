@@ -1,4 +1,4 @@
-package com.example.myapplication.app.screen.demo.main
+package com.example.myapplication.app.screen.demo
 
 import com.example.domain.country.Country
 import com.example.domain.country.GetCountriesInteractor
@@ -14,8 +14,16 @@ class CountryMiddleware @Inject constructor(private val getCountriesInteractor: 
 	override fun apply(upstream: Observable<Input>): ObservableSource<CommandResult> {
 		return upstream.switchMap {
 			getCountriesInteractor.countries
-				.map<Output> { Output.Loaded(it) }
-				.onErrorReturn { Output.Failed(it.message ?: "Can't load countries") }
+				.map<Output> {
+					Output.Loaded(
+						it
+					)
+				}
+				.onErrorReturn {
+					Output.Failed(
+						it.message ?: "Can't load countries"
+					)
+				}
 				.startWith(Output.Loading)
 		}
 	}

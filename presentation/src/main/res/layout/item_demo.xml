@@ -5,7 +5,7 @@
 	>
 
 	<TextView
-		android:id = "@+id/main_item_text"
+		android:id = "@+id/demo_item_text"
 		android:layout_width = "match_parent"
 		android:layout_height = "wrap_content"
 		/>
