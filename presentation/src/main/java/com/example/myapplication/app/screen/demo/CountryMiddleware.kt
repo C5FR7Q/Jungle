@@ -10,7 +10,7 @@ import io.reactivex.ObservableSource
 import javax.inject.Inject
 
 class CountryMiddleware @Inject constructor(private val getCountriesInteractor: GetCountriesInteractor) :
-	Middleware<CountryMiddleware.Input, CommandResult> {
+	Middleware<CountryMiddleware.Input> {
 	override fun apply(upstream: Observable<Input>): ObservableSource<CommandResult> {
 		return upstream.switchMap {
 			getCountriesInteractor.countries

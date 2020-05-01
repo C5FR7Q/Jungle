@@ -13,15 +13,15 @@ abstract class CommandExecutor<State> {
 	 * */
 	protected abstract fun Observable<Command>.splitByMiddleware(state: Observable<State>): List<Observable<CommandResult>>
 
-	protected inline fun <reified Input : Command, Output : CommandResult> Observable<Command>.bind(
-		middleware: Middleware<Input, Output>
-	): Observable<Output> =
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: Middleware<Input>
+	): Observable<CommandResult> =
 		ofType(Input::class.java).compose(middleware)
 
-	protected inline fun <reified Input : Command, Output : CommandResult> Observable<Command>.bind(
-		middleware: StatefulMiddleware<Input, State, Output>,
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: StatefulMiddleware<Input, State>,
 		state: Observable<State>
-	): Observable<Output> {
+	): Observable<CommandResult> {
 		return ofType(Input::class.java)
 			.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })
 			.compose(middleware)
