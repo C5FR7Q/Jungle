@@ -13,7 +13,7 @@ import io.reactivex.subjects.PublishSubject
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val eventMapper: EventMapper<Event>,
+	private val eventMapper: EventMapper<Event>? = null,
 	private val actionProducer: ActionProducer<Action>? = null,
 	private val bootstrapper: Bootstrapper? = null,
 	private val commandExecutor: CommandExecutor<State>? = null,
@@ -37,7 +37,9 @@ abstract class Store<Event, State, Action>(
 	fun dispatchEvent(event: Observable<Event>) {
 		if (attached) {
 			lifeCycleSubscriptions.add(
-				event.observeOn(foregroundScheduler).subscribe { commands.onNext(eventMapper.convert(it)) }
+				event.observeOn(foregroundScheduler).subscribe { ev ->
+					eventMapper?.let { commands.onNext(it.convert(ev)) }
+				}
 			)
 		}
 	}
