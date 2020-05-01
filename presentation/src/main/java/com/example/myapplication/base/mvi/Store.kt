@@ -101,6 +101,10 @@ abstract class Store<Event, State, Action>(
 				)
 			}
 
+			if (commandProducer == null && reducer == null) {
+				processCommandsSubscriptions.add(commandResultSource.subscribe())
+			}
+
 		}
 	}
 
