@@ -28,7 +28,7 @@ class DemoFragment : BaseFragment(), MviView<DemoState, DemoAction> {
 
 		demoStore.run {
 			attach(this@DemoFragment)
-			dispatchEvent(RxView.clicks(demo_load).map { DemoEvent.Load })
+			dispatchEventSource(RxView.clicks(demo_load).map { DemoEvent.Load })
 		}
 	}
 

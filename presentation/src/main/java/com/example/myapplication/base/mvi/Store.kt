@@ -34,7 +34,11 @@ abstract class Store<Event, State, Action>(
 		reducer?.let { states.onNext(it.initialState) }
 	}
 
-	fun dispatchEvent(event: Observable<Event>) {
+	fun dispatchEvent(event: Event) {
+		dispatchEventSource(Observable.just(event))
+	}
+
+	fun dispatchEventSource(event: Observable<Event>) {
 		if (attached) {
 			lifeCycleSubscriptions.add(
 				event.observeOn(foregroundScheduler).subscribe { ev ->
