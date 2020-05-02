@@ -13,8 +13,7 @@ import io.reactivex.subjects.PublishSubject
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val commandExecutor: CommandExecutor<State>? = null,
-	private val reducer: Reducer<State>? = null
+	private val commandExecutor: CommandExecutor<State>? = null
 ) {
 
 	private val commands = PublishSubject.create<Command>()
@@ -27,7 +26,11 @@ abstract class Store<Event, State, Action>(
 	private var attached = false
 
 	init {
-		reducer?.let { states.onNext(it.initialState) }
+		try {
+			@Suppress("LeakingThis")
+			states.onNext(initialState)
+		} catch (ignored: NotImplementedError) {
+		}
 	}
 
 	fun dispatchEvent(event: Event) {
@@ -73,6 +76,10 @@ abstract class Store<Event, State, Action>(
 
 	open fun produceCommand(commandResult: CommandResult): Command? = null
 
+	open val initialState: State = TODO("Not used")
+
+	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
+
 	fun launch() {
 		val bootstrapCommandsSource = try {
 			Observable.fromIterable(bootstrapCommands)
@@ -104,19 +111,12 @@ abstract class Store<Event, State, Action>(
 				}
 			)
 
-			if (reducer != null) {
-				val initialState = states.value!!
-				processCommandsSubscriptions.add(
-					commandResultSource.scan(initialState, { state, internalAction -> reducer.reduce(state, internalAction) })
-						.distinctUntilChanged()
-						.subscribe { states.onNext(it) }
-				)
-			}
-
-			if (reducer == null) {
-				processCommandsSubscriptions.add(commandResultSource.subscribe())
-			}
-
+			val initialState = states.value!!
+			processCommandsSubscriptions.add(
+				commandResultSource.scan(initialState, { state, commandResult -> reduceCommandResult(state, commandResult) })
+					.distinctUntilChanged()
+					.subscribe { states.onNext(it) }
+			)
 		}
 	}
 
