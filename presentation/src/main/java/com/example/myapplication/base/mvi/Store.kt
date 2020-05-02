@@ -1,6 +1,7 @@
 package com.example.myapplication.base.mvi
 
 import com.example.myapplication.base.mvi.command.Command
+import com.example.myapplication.base.mvi.command.CommandCommandResult
 import com.example.myapplication.base.mvi.command.CommandExecutor
 import com.example.myapplication.base.mvi.producer.ActionProducer
 import com.example.myapplication.base.mvi.producer.CommandProducer
@@ -84,7 +85,10 @@ abstract class Store<Event, State, Action>(
 		}
 
 		if (commandExecutor != null) {
-			val commandResultSource = commandExecutor.execute(commandSource, states)
+			val commandResultSource = Observable.merge(
+				commandExecutor.execute(commandSource, states),
+				commandSource.ofType(CommandCommandResult::class.java)
+			)
 				.replay(1)
 				.refCount()
 
