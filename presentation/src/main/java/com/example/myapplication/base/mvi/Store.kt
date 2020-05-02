@@ -1,6 +1,5 @@
 package com.example.myapplication.base.mvi
 
-import android.util.Log
 import com.example.myapplication.base.mvi.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -89,15 +88,18 @@ abstract class Store<Event, State, Action>(
 			}
 		)
 
-		if (!states.hasValue()) {
-			states.onNext(initialState)
+		try {
+			if (!states.hasValue()) {
+				states.onNext(initialState)
+			}
+			val initState = states.value!!
+			processCommandsSubscriptions.add(
+				commandResultSource.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
+					.distinctUntilChanged()
+					.subscribe { states.onNext(it) }
+			)
+		} catch (ignored: NotImplementedException) {
 		}
-		val initState = states.value!!
-		processCommandsSubscriptions.add(
-			commandResultSource.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
-				.distinctUntilChanged()
-				.subscribe { states.onNext(it) }
-		)
 	}
 
 	fun finish() {
