@@ -20,12 +20,13 @@ class DemoStore @Inject constructor(
 	foregroundScheduler = foregroundScheduler,
 	backgroundScheduler = backgroundScheduler
 ) {
+	override val initialState = DemoState()
+	override val bootstrapCommands = listOf(CountryMiddleware.Input)
+
 	override fun convertEvent(event: DemoEvent) =
 		when (event) {
 			is DemoEvent.Load -> CountryMiddleware.Input
 		}
-
-	override val bootstrapCommands = listOf(CountryMiddleware.Input)
 
 	override fun produceAction(command: Command) = when (command) {
 		is ProduceActionCommand.Error -> DemoAction.ShowError(command.error)
@@ -33,11 +34,9 @@ class DemoStore @Inject constructor(
 	}
 
 	override fun produceCommand(commandResult: CommandResult) = when (commandResult) {
-		is CountryMiddleware.Output.Failed -> DemoStore.ProduceActionCommand.Error(commandResult.error)
+		is CountryMiddleware.Output.Failed -> ProduceActionCommand.Error(commandResult.error)
 		else -> null
 	}
-
-	override val initialState = DemoState()
 
 	override fun reduceCommandResult(state: DemoState, commandResult: CommandResult) = when (commandResult) {
 		is CountryMiddleware.Output.Loading -> state.copy(loading = true)

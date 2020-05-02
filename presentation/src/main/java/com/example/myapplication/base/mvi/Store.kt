@@ -22,9 +22,11 @@ abstract class Store<Event, State, Action>(
 
 	private var attached = false
 
+	open val initialState: State = TODO("Not used")
+	open val bootstrapCommands: List<Command> = TODO("Not used")
+
 	init {
 		try {
-			@Suppress("LeakingThis")
 			states.onNext(initialState)
 		} catch (ignored: NotImplementedError) {
 		}
@@ -48,8 +50,6 @@ abstract class Store<Event, State, Action>(
 		}
 	}
 
-	open fun convertEvent(event: Event): Command = TODO("Not used")
-
 	fun attach(view: MviView<State, Action>) {
 		launch()
 		lifeCycleSubscriptions.add(
@@ -65,39 +65,6 @@ abstract class Store<Event, State, Action>(
 		lifeCycleSubscriptions.dispose()
 		attached = false
 		finish()
-	}
-
-	open val bootstrapCommands: List<Command> = TODO("Not used")
-
-	open fun produceAction(command: Command): Action? = null
-
-	open fun produceCommand(commandResult: CommandResult): Command? = null
-
-	open val initialState: State = TODO("Not used")
-
-	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
-
-	private fun executeCommands(commands: Observable<Command>, state: Observable<State>): Observable<CommandResult> =
-		commands.publish { Observable.merge(it.splitByMiddleware(state)) }
-
-	/**
-	 * should return
-	 * listOf(bind({Middleware1}), bind({Middleware2}, etc.))
-	 * */
-	open fun Observable<Command>.splitByMiddleware(state: Observable<State>): List<Observable<CommandResult>> = emptyList()
-
-	protected inline fun <reified Input : Command> Observable<Command>.bind(
-		middleware: Middleware<Input>
-	): Observable<CommandResult> =
-		ofType(Input::class.java).compose(middleware)
-
-	protected inline fun <reified Input : Command> Observable<Command>.bind(
-		middleware: StatefulMiddleware<Input, State>,
-		state: Observable<State>
-	): Observable<CommandResult> {
-		return ofType(Input::class.java)
-			.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })
-			.compose(middleware)
 	}
 
 	fun launch() {
@@ -141,4 +108,32 @@ abstract class Store<Event, State, Action>(
 	fun finish() {
 		processCommandsSubscriptions.dispose()
 	}
+
+	open fun convertEvent(event: Event): Command = TODO("Not used")
+	open fun produceAction(command: Command): Action? = null
+	open fun produceCommand(commandResult: CommandResult): Command? = null
+	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
+
+	/**
+	 * should return
+	 * listOf(bind({Middleware1}), bind({Middleware2}, etc.))
+	 * */
+	open fun Observable<Command>.splitByMiddleware(state: Observable<State>): List<Observable<CommandResult>> = emptyList()
+
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: Middleware<Input>
+	): Observable<CommandResult> =
+		ofType(Input::class.java).compose(middleware)
+
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: StatefulMiddleware<Input, State>,
+		state: Observable<State>
+	): Observable<CommandResult> {
+		return ofType(Input::class.java)
+			.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })
+			.compose(middleware)
+	}
+
+	private fun executeCommands(commands: Observable<Command>, state: Observable<State>): Observable<CommandResult> =
+		commands.publish { Observable.merge(it.splitByMiddleware(state)) }
 }
