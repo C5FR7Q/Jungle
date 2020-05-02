@@ -23,7 +23,7 @@ abstract class Store<Event, State, Action>(
 	private var attached = false
 
 	open val initialState: State = TODO("Not used")
-	open val bootstrapCommands: List<Command> = TODO("Not used")
+	open val bootstrapCommands = emptyList<Command>()
 
 	init {
 		try {
@@ -68,12 +68,8 @@ abstract class Store<Event, State, Action>(
 	}
 
 	fun launch() {
-		val bootstrapCommandsSource = try {
-			Observable.fromIterable(bootstrapCommands)
-		} catch (ignored: NotImplementedError) {
-			null
-		}
-		val commandSource = commands.let { bootstrapCommandsSource?.mergeWith(it) ?: it }
+		val bootstrapCommandsSource = Observable.fromIterable(bootstrapCommands)
+		val commandSource = commands.let { bootstrapCommandsSource.mergeWith(it) ?: it }
 			.subscribeOn(backgroundScheduler)
 			.replay(1)
 			.refCount()
