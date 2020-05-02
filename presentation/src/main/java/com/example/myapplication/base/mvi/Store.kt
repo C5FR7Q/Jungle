@@ -14,7 +14,6 @@ import io.reactivex.subjects.PublishSubject
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val eventMapper: EventMapper<Event>? = null,
 	private val actionProducer: ActionProducer<Action>? = null,
 	private val bootstrapper: Bootstrapper? = null,
 	private val commandExecutor: CommandExecutor<State>? = null,
@@ -39,15 +38,21 @@ abstract class Store<Event, State, Action>(
 		dispatchEventSource(Observable.just(event))
 	}
 
-	fun dispatchEventSource(event: Observable<Event>) {
+	fun dispatchEventSource(eventSource: Observable<Event>) {
 		if (attached) {
 			lifeCycleSubscriptions.add(
-				event.observeOn(foregroundScheduler).subscribe { ev ->
-					eventMapper?.let { commands.onNext(it.convert(ev)) }
+				eventSource.observeOn(foregroundScheduler).subscribe { event ->
+					try {
+						val command = convertEvent(event)
+						commands.onNext(command)
+					} catch (ignored: NotImplementedError) {
+					}
 				}
 			)
 		}
 	}
+
+	open fun convertEvent(event: Event): Command = TODO("Not used")
 
 	fun attach(view: MviView<State, Action>) {
 		launch()
