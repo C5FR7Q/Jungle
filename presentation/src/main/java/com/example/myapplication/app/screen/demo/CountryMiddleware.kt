@@ -9,9 +9,12 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import javax.inject.Inject
 
-class CountryMiddleware @Inject constructor(private val getCountriesInteractor: GetCountriesInteractor) :
-	Middleware<CountryMiddleware.Input> {
-	override fun apply(upstream: Observable<Input>): ObservableSource<CommandResult> {
+class CountryMiddleware @Inject constructor(
+	private val getCountriesInteractor: GetCountriesInteractor
+) : Middleware<CountryMiddleware.Input>() {
+	override val inputType = Input::class.java
+
+	override fun transform(upstream: Observable<Input>): ObservableSource<CommandResult> {
 		return upstream.switchMap {
 			getCountriesInteractor.countries
 				.map<Output> {

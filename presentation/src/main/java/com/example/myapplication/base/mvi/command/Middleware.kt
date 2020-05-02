@@ -1,7 +1,13 @@
 package com.example.myapplication.base.mvi.command
 
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.ObservableTransformer
 
-interface Middleware<C : Command> : ObservableTransformer<C, CommandResult>
+abstract class Middleware<Input : Command> : ObservableTransformer<Command, CommandResult> {
+	override fun apply(upstream: Observable<Command>) = upstream.ofType(inputType).compose { transform(it) }
 
-interface StatefulMiddleware<C : Command, S> : ObservableTransformer<Pair<C, S>, CommandResult>
+	abstract val inputType: Class<Input>
+
+	abstract fun transform(upstream: Observable<Input>): ObservableSource<CommandResult>
+}

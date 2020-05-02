@@ -4,7 +4,6 @@ import com.example.myapplication.base.mvi.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 
@@ -24,6 +23,8 @@ abstract class Store<Event, State, Action>(
 
 	open val initialState: State = TODO("Not used")
 	open val bootstrapCommands = emptyList<Command>()
+	open val statefulMiddlewares = emptyList<StatefulMiddleware<*, State>>()
+	open val middlewares = emptyList<Middleware<*>>()
 
 	init {
 		try {
@@ -110,26 +111,12 @@ abstract class Store<Event, State, Action>(
 	open fun produceCommand(commandResult: CommandResult): Command? = null
 	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
 
-	/**
-	 * should return
-	 * listOf(bind({Middleware1}), bind({Middleware2}, etc.))
-	 * */
-	open fun Observable<Command>.splitByMiddleware(state: Observable<State>): List<Observable<CommandResult>> = emptyList()
-
-	protected inline fun <reified Input : Command> Observable<Command>.bind(
-		middleware: Middleware<Input>
-	): Observable<CommandResult> =
-		ofType(Input::class.java).compose(middleware)
-
-	protected inline fun <reified Input : Command> Observable<Command>.bind(
-		middleware: StatefulMiddleware<Input, State>,
-		state: Observable<State>
-	): Observable<CommandResult> {
-		return ofType(Input::class.java)
-			.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })
-			.compose(middleware)
-	}
-
 	private fun executeCommands(commands: Observable<Command>, state: Observable<State>): Observable<CommandResult> =
-		commands.publish { Observable.merge(it.splitByMiddleware(state)) }
+		commands.publish { commandSource ->
+			statefulMiddlewares.forEach { it.attachState(state) }
+			Observable.merge(mutableListOf<Observable<CommandResult>>().apply {
+				addAll(statefulMiddlewares.map { commandSource.compose(it) })
+				addAll(middlewares.map { commandSource.compose(it) })
+			})
+		}
 }
