@@ -1,19 +1,16 @@
 package com.example.myapplication.base.mvi
 
-import com.example.myapplication.base.mvi.command.Command
-import com.example.myapplication.base.mvi.command.CommandCommandResult
-import com.example.myapplication.base.mvi.command.CommandExecutor
-import com.example.myapplication.base.mvi.command.CommandResult
+import com.example.myapplication.base.mvi.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
-	private val backgroundScheduler: Scheduler,
-	private val commandExecutor: CommandExecutor<State>? = null
+	private val backgroundScheduler: Scheduler
 ) {
 
 	private val commands = PublishSubject.create<Command>()
@@ -80,6 +77,29 @@ abstract class Store<Event, State, Action>(
 
 	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
 
+	private fun executeCommands(commands: Observable<Command>, state: Observable<State>): Observable<CommandResult> =
+		commands.publish { Observable.merge(it.splitByMiddleware(state)) }
+
+	/**
+	 * should return
+	 * listOf(bind({Middleware1}), bind({Middleware2}, etc.))
+	 * */
+	open fun Observable<Command>.splitByMiddleware(state: Observable<State>): List<Observable<CommandResult>> = emptyList()
+
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: Middleware<Input>
+	): Observable<CommandResult> =
+		ofType(Input::class.java).compose(middleware)
+
+	protected inline fun <reified Input : Command> Observable<Command>.bind(
+		middleware: StatefulMiddleware<Input, State>,
+		state: Observable<State>
+	): Observable<CommandResult> {
+		return ofType(Input::class.java)
+			.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })
+			.compose(middleware)
+	}
+
 	fun launch() {
 		val bootstrapCommandsSource = try {
 			Observable.fromIterable(bootstrapCommands)
@@ -97,27 +117,25 @@ abstract class Store<Event, State, Action>(
 			}
 		)
 
-		if (commandExecutor != null) {
-			val commandResultSource = Observable.merge(
-				commandExecutor.execute(commandSource, states),
-				commandSource.ofType(CommandCommandResult::class.java)
-			)
-				.replay(1)
-				.refCount()
+		val commandResultSource = Observable.merge(
+			executeCommands(commandSource, states),
+			commandSource.ofType(CommandCommandResult::class.java)
+		)
+			.replay(1)
+			.refCount()
 
-			processCommandsSubscriptions.add(
-				commandResultSource.subscribe { commandResult ->
-					produceCommand(commandResult)?.let { commands.onNext(it) }
-				}
-			)
+		processCommandsSubscriptions.add(
+			commandResultSource.subscribe { commandResult ->
+				produceCommand(commandResult)?.let { commands.onNext(it) }
+			}
+		)
 
-			val initialState = states.value!!
-			processCommandsSubscriptions.add(
-				commandResultSource.scan(initialState, { state, commandResult -> reduceCommandResult(state, commandResult) })
-					.distinctUntilChanged()
-					.subscribe { states.onNext(it) }
-			)
-		}
+		val initialState = states.value!!
+		processCommandsSubscriptions.add(
+			commandResultSource.scan(initialState, { state, commandResult -> reduceCommandResult(state, commandResult) })
+				.distinctUntilChanged()
+				.subscribe { states.onNext(it) }
+		)
 	}
 
 	fun finish() {

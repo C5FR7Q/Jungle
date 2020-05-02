@@ -7,6 +7,7 @@ import com.example.myapplication.app.screen.demo.DemoState
 import com.example.myapplication.base.mvi.Store
 import com.example.myapplication.base.mvi.command.Command
 import com.example.myapplication.base.mvi.command.CommandResult
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import javax.inject.Inject
 import javax.inject.Named
@@ -14,11 +15,10 @@ import javax.inject.Named
 class DemoStore @Inject constructor(
 	@Named("foregroundScheduler") foregroundScheduler: Scheduler,
 	@Named("backgroundScheduler") backgroundScheduler: Scheduler,
-	commandExecutor: DemoCommandExecutor
+	private val countryMiddleware: CountryMiddleware
 ) : Store<DemoEvent, DemoState, DemoAction>(
 	foregroundScheduler = foregroundScheduler,
-	backgroundScheduler = backgroundScheduler,
-	commandExecutor = commandExecutor
+	backgroundScheduler = backgroundScheduler
 ) {
 	override fun convertEvent(event: DemoEvent) =
 		when (event) {
@@ -45,6 +45,9 @@ class DemoStore @Inject constructor(
 		is CountryMiddleware.Output.Failed -> state.copy(loading = false)
 		else -> state
 	}
+
+	override fun Observable<Command>.splitByMiddleware(state: Observable<DemoState>): List<Observable<CommandResult>> =
+		listOf(bind(countryMiddleware))
 
 	sealed class ProduceActionCommand : Command {
 		data class Error(val error: String) : ProduceActionCommand()
