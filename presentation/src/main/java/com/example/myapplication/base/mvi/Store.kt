@@ -1,5 +1,6 @@
 package com.example.myapplication.base.mvi
 
+import android.util.Log
 import com.example.myapplication.base.mvi.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -21,17 +22,11 @@ abstract class Store<Event, State, Action>(
 
 	private var attached = false
 
-	protected open val initialState: State = TODO("Not used")
+	protected open val initialState: State
+		get() = throw NotImplementedException()
 	protected open val bootstrapCommands = emptyList<Command>()
 	protected open val statefulMiddlewares = emptyList<StatefulMiddleware<*, State>>()
 	protected open val middlewares = emptyList<Middleware<*>>()
-
-	init {
-		try {
-			states.onNext(initialState)
-		} catch (ignored: NotImplementedError) {
-		}
-	}
 
 	fun dispatchEvent(event: Event) {
 		dispatchEventSource(Observable.just(event))
@@ -44,7 +39,7 @@ abstract class Store<Event, State, Action>(
 					try {
 						val command = convertEvent(event)
 						commands.onNext(command)
-					} catch (ignored: NotImplementedError) {
+					} catch (ignored: NotImplementedException) {
 					}
 				}
 			)
@@ -94,9 +89,12 @@ abstract class Store<Event, State, Action>(
 			}
 		)
 
-		val initialState = states.value!!
+		if (!states.hasValue()) {
+			states.onNext(initialState)
+		}
+		val initState = states.value!!
 		processCommandsSubscriptions.add(
-			commandResultSource.scan(initialState, { state, commandResult -> reduceCommandResult(state, commandResult) })
+			commandResultSource.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
 				.distinctUntilChanged()
 				.subscribe { states.onNext(it) }
 		)
@@ -106,7 +104,7 @@ abstract class Store<Event, State, Action>(
 		processCommandsSubscriptions.dispose()
 	}
 
-	protected open fun convertEvent(event: Event): Command = TODO("Not used")
+	protected open fun convertEvent(event: Event): Command = throw NotImplementedException()
 	protected open fun produceAction(command: Command): Action? = null
 	protected open fun produceCommand(commandResult: CommandResult): Command? = null
 	protected open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
