@@ -3,7 +3,7 @@ package com.example.myapplication.base.mvi
 import com.example.myapplication.base.mvi.command.Command
 import com.example.myapplication.base.mvi.command.CommandCommandResult
 import com.example.myapplication.base.mvi.command.CommandExecutor
-import com.example.myapplication.base.mvi.producer.CommandProducer
+import com.example.myapplication.base.mvi.command.CommandResult
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
@@ -14,8 +14,7 @@ abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
 	private val commandExecutor: CommandExecutor<State>? = null,
-	private val reducer: Reducer<State>? = null,
-	private val commandProducer: CommandProducer? = null
+	private val reducer: Reducer<State>? = null
 ) {
 
 	private val commands = PublishSubject.create<Command>()
@@ -72,6 +71,8 @@ abstract class Store<Event, State, Action>(
 
 	open fun produceAction(command: Command): Action? = null
 
+	open fun produceCommand(commandResult: CommandResult): Command? = null
+
 	fun launch() {
 		val bootstrapCommandsSource = try {
 			Observable.fromIterable(bootstrapCommands)
@@ -97,13 +98,11 @@ abstract class Store<Event, State, Action>(
 				.replay(1)
 				.refCount()
 
-			if (commandProducer != null) {
-				processCommandsSubscriptions.add(
-					commandResultSource.subscribe { commandResult ->
-						commandProducer.produce(commandResult)?.let { commands.onNext(it) }
-					}
-				)
-			}
+			processCommandsSubscriptions.add(
+				commandResultSource.subscribe { commandResult ->
+					produceCommand(commandResult)?.let { commands.onNext(it) }
+				}
+			)
 
 			if (reducer != null) {
 				val initialState = states.value!!
@@ -114,7 +113,7 @@ abstract class Store<Event, State, Action>(
 				)
 			}
 
-			if (commandProducer == null && reducer == null) {
+			if (reducer == null) {
 				processCommandsSubscriptions.add(commandResultSource.subscribe())
 			}
 

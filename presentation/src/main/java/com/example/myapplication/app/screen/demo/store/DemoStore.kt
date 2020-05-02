@@ -6,6 +6,7 @@ import com.example.myapplication.app.screen.demo.DemoEvent
 import com.example.myapplication.app.screen.demo.DemoState
 import com.example.myapplication.base.mvi.Store
 import com.example.myapplication.base.mvi.command.Command
+import com.example.myapplication.base.mvi.command.CommandResult
 import io.reactivex.Scheduler
 import javax.inject.Inject
 import javax.inject.Named
@@ -14,14 +15,12 @@ class DemoStore @Inject constructor(
 	@Named("foregroundScheduler") foregroundScheduler: Scheduler,
 	@Named("backgroundScheduler") backgroundScheduler: Scheduler,
 	commandExecutor: DemoCommandExecutor,
-	reducer: DemoReducer,
-	commandProducer: DemoCommandProducer
+	reducer: DemoReducer
 ) : Store<DemoEvent, DemoState, DemoAction>(
 	foregroundScheduler = foregroundScheduler,
 	backgroundScheduler = backgroundScheduler,
 	commandExecutor = commandExecutor,
-	reducer = reducer,
-	commandProducer = commandProducer
+	reducer = reducer
 ) {
 	override fun convertEvent(event: DemoEvent) =
 		when (event) {
@@ -32,6 +31,11 @@ class DemoStore @Inject constructor(
 
 	override fun produceAction(command: Command) = when (command) {
 		is ProduceActionCommand.Error -> DemoAction.ShowError(command.error)
+		else -> null
+	}
+
+	override fun produceCommand(commandResult: CommandResult) = when (commandResult) {
+		is CountryMiddleware.Output.Failed -> DemoStore.ProduceActionCommand.Error(commandResult.error)
 		else -> null
 	}
 
