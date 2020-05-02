@@ -15,7 +15,6 @@ abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
 	private val actionProducer: ActionProducer<Action>? = null,
-	private val bootstrapper: Bootstrapper? = null,
 	private val commandExecutor: CommandExecutor<State>? = null,
 	private val reducer: Reducer<State>? = null,
 	private val commandProducer: CommandProducer? = null
@@ -71,12 +70,15 @@ abstract class Store<Event, State, Action>(
 		finish()
 	}
 
-	fun launch() {
-		val bootstrapCommands = if (bootstrapper != null)
-			Observable.fromIterable(bootstrapper.bootstrapCommands) else
-			null
+	open val bootstrapCommands: List<Command> = TODO("Not used")
 
-		val commandSource = commands.let { bootstrapCommands?.mergeWith(it) ?: it }
+	fun launch() {
+		val bootstrapCommandsSource = try {
+			Observable.fromIterable(bootstrapCommands)
+		} catch (ignored: NotImplementedError) {
+			null
+		}
+		val commandSource = commands.let { bootstrapCommandsSource?.mergeWith(it) ?: it }
 			.subscribeOn(backgroundScheduler)
 			.replay(1)
 			.refCount()

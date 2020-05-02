@@ -13,7 +13,6 @@ class DemoStore @Inject constructor(
 	@Named("foregroundScheduler") foregroundScheduler: Scheduler,
 	@Named("backgroundScheduler") backgroundScheduler: Scheduler,
 	actionProducer: DemoActionProducer,
-	bootstrapper: DemoBootstrapper,
 	commandExecutor: DemoCommandExecutor,
 	reducer: DemoReducer,
 	commandProducer: DemoCommandProducer
@@ -21,7 +20,6 @@ class DemoStore @Inject constructor(
 	foregroundScheduler = foregroundScheduler,
 	backgroundScheduler = backgroundScheduler,
 	actionProducer = actionProducer,
-	bootstrapper = bootstrapper,
 	commandExecutor = commandExecutor,
 	reducer = reducer,
 	commandProducer = commandProducer
@@ -30,4 +28,6 @@ class DemoStore @Inject constructor(
 		when (event) {
 			is DemoEvent.Load -> CountryMiddleware.Input
 		}
+
+	override val bootstrapCommands = listOf(CountryMiddleware.Input)
 }
