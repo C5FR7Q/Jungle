@@ -3,7 +3,6 @@ package com.example.myapplication.base.mvi
 import com.example.myapplication.base.mvi.command.Command
 import com.example.myapplication.base.mvi.command.CommandCommandResult
 import com.example.myapplication.base.mvi.command.CommandExecutor
-import com.example.myapplication.base.mvi.producer.ActionProducer
 import com.example.myapplication.base.mvi.producer.CommandProducer
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -14,7 +13,6 @@ import io.reactivex.subjects.PublishSubject
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
 	private val backgroundScheduler: Scheduler,
-	private val actionProducer: ActionProducer<Action>? = null,
 	private val commandExecutor: CommandExecutor<State>? = null,
 	private val reducer: Reducer<State>? = null,
 	private val commandProducer: CommandProducer? = null
@@ -72,6 +70,8 @@ abstract class Store<Event, State, Action>(
 
 	open val bootstrapCommands: List<Command> = TODO("Not used")
 
+	open fun produceAction(command: Command): Action? = null
+
 	fun launch() {
 		val bootstrapCommandsSource = try {
 			Observable.fromIterable(bootstrapCommands)
@@ -83,13 +83,11 @@ abstract class Store<Event, State, Action>(
 			.replay(1)
 			.refCount()
 
-		if (actionProducer != null) {
-			processCommandsSubscriptions.add(
-				commandSource.subscribe { command ->
-					actionProducer.produce(command)?.let { actions.onNext(it) }
-				}
-			)
-		}
+		processCommandsSubscriptions.add(
+			commandSource.subscribe { command ->
+				produceAction(command)?.let { actions.onNext(it) }
+			}
+		)
 
 		if (commandExecutor != null) {
 			val commandResultSource = Observable.merge(

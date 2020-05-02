@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class DemoCommandProducer @Inject constructor() : CommandProducer {
 	override fun produce(input: CommandResult) = when (input) {
-		is CountryMiddleware.Output.Failed -> DemoActionProducer.Input.Error(input.error)
+		is CountryMiddleware.Output.Failed -> DemoStore.ProduceActionCommand.Error(input.error)
 		else -> null
 	}
 }
