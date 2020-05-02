@@ -21,10 +21,10 @@ abstract class Store<Event, State, Action>(
 
 	private var attached = false
 
-	open val initialState: State = TODO("Not used")
-	open val bootstrapCommands = emptyList<Command>()
-	open val statefulMiddlewares = emptyList<StatefulMiddleware<*, State>>()
-	open val middlewares = emptyList<Middleware<*>>()
+	protected open val initialState: State = TODO("Not used")
+	protected open val bootstrapCommands = emptyList<Command>()
+	protected open val statefulMiddlewares = emptyList<StatefulMiddleware<*, State>>()
+	protected open val middlewares = emptyList<Middleware<*>>()
 
 	init {
 		try {
@@ -106,10 +106,10 @@ abstract class Store<Event, State, Action>(
 		processCommandsSubscriptions.dispose()
 	}
 
-	open fun convertEvent(event: Event): Command = TODO("Not used")
-	open fun produceAction(command: Command): Action? = null
-	open fun produceCommand(commandResult: CommandResult): Command? = null
-	open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
+	protected open fun convertEvent(event: Event): Command = TODO("Not used")
+	protected open fun produceAction(command: Command): Action? = null
+	protected open fun produceCommand(commandResult: CommandResult): Command? = null
+	protected open fun reduceCommandResult(state: State, commandResult: CommandResult): State = state
 
 	private fun executeCommands(commands: Observable<Command>, state: Observable<State>): Observable<CommandResult> =
 		commands.publish { commandSource ->
