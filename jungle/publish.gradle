@@ -4,10 +4,14 @@ apply plugin: 'com.jfrog.bintray'
 version '1.0.0' // your library version
 group 'com.github.c5fr7q' // whatever group name you'd like
 
+task sourceJar(type: Jar) {
+	archiveClassifier = "sources"
+}
+
 publishing {
 	publications {
 		Production(MavenPublication) {
-			artifact("$buildDir/libs/jungle-${version}.jar") // replace with your library name
+			artifact(sourceJar) // replace with your library name
 			groupId this.group
 			artifactId 'jungle' // replace with your library artifact id
 			version this.version
