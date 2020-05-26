@@ -7,7 +7,6 @@ group 'com.github.c5fr7q' // whatever group name you'd like
 publishing {
 	publications {
 		Production(MavenPublication) {
-//			artifact("$buildDir/outputs/aar/jungle-release.aar") // replace with your library name
 			artifact("$buildDir/libs/jungle-${version}.jar") // replace with your library name
 			groupId this.group
 			artifactId 'jungle' // replace with your library artifact id
