@@ -1,4 +1,4 @@
-package com.example.myapplication.base.mvi
+package com.github.c5fr7q.jungle
 
 interface MviView<State, Action> {
 	fun render(state: State) {}

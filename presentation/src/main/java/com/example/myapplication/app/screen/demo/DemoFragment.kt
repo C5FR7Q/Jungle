@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.c5fr7q.jungle.MviView
 import com.example.myapplication.R
 import com.example.myapplication.app.screen.demo.store.DemoStore
 import com.example.myapplication.base.BaseFragment
-import com.example.myapplication.base.mvi.MviView
 import com.jakewharton.rxbinding2.view.RxView
 import kotlinx.android.synthetic.main.fragment_demo.*
 import javax.inject.Inject
