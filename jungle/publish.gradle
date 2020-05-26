@@ -44,7 +44,7 @@ bintray {
 	publish = true
 	pkg {
 		repo = 'Jungle' // the name of the repository you created on Bintray
-		name = 'com.github.c5fr7q.jungle'
+		name = 'jungle'
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/C5FR7Q/Jungle.git'
 		version {
