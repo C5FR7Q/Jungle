@@ -9,3 +9,5 @@ dependencies {
 
 sourceCompatibility = "7"
 targetCompatibility = "7"
+
+apply from: 'publish.gradle'
