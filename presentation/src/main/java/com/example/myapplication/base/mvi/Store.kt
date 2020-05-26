@@ -6,6 +6,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 
 abstract class Store<Event, State, Action>(
 	private val foregroundScheduler: Scheduler,
@@ -64,26 +65,25 @@ abstract class Store<Event, State, Action>(
 
 	fun launch() {
 		val bootstrapCommandsSource = Observable.fromIterable(bootstrapCommands)
-		val commandSource = commands.let { bootstrapCommandsSource.mergeWith(it) ?: it }
+		val commandSourceSubject: ReplaySubject<Command> = ReplaySubject.create()
+		commands.let { bootstrapCommandsSource.mergeWith(it) ?: it }
 			.subscribeOn(backgroundScheduler)
-			.replay(1)
-			.refCount()
+			.subscribe(commandSourceSubject)
 
 		processCommandsSubscriptions.add(
-			commandSource.subscribe { command ->
+			commandSourceSubject.subscribe { command ->
 				produceAction(command)?.let { actions.onNext(it) }
 			}
 		)
 
-		val commandResultSource = Observable.merge(
-			executeCommands(commandSource, states),
-			commandSource.ofType(CommandCommandResult::class.java)
-		)
-			.replay(1)
-			.refCount()
+		val commandResultSourceSubject: ReplaySubject<CommandResult> = ReplaySubject.create()
+		Observable.merge(
+			executeCommands(commandSourceSubject, states),
+			commandSourceSubject.ofType(CommandCommandResult::class.java)
+		).subscribe(commandResultSourceSubject)
 
 		processCommandsSubscriptions.add(
-			commandResultSource.subscribe { commandResult ->
+			commandResultSourceSubject.subscribe { commandResult ->
 				produceCommand(commandResult)?.let { commands.onNext(it) }
 			}
 		)
@@ -94,7 +94,7 @@ abstract class Store<Event, State, Action>(
 			}
 			val initState = states.value!!
 			processCommandsSubscriptions.add(
-				commandResultSource.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
+				commandResultSourceSubject.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
 					.distinctUntilChanged()
 					.subscribe { states.onNext(it) }
 			)
