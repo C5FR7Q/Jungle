@@ -1,8 +1,8 @@
 package com.example.myapplication.app.screen.demo.store
 
-import com.c5fr7q.jungle.Store
-import com.c5fr7q.jungle.command.Command
-import com.c5fr7q.jungle.command.CommandResult
+import com.github.c5fr7q.jungle.Store
+import com.github.c5fr7q.jungle.command.Command
+import com.github.c5fr7q.jungle.command.CommandResult
 import com.example.myapplication.app.screen.demo.CountryMiddleware
 import com.example.myapplication.app.screen.demo.DemoAction
 import com.example.myapplication.app.screen.demo.DemoEvent

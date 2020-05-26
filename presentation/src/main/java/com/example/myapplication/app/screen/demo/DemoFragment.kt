@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.c5fr7q.jungle.MviView
+import com.github.c5fr7q.jungle.MviView
 import com.example.myapplication.R
 import com.example.myapplication.app.screen.demo.store.DemoStore
 import com.example.myapplication.base.BaseFragment

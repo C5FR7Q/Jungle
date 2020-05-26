@@ -1,4 +1,4 @@
-package com.c5fr7q.jungle.command
+package com.github.c5fr7q.jungle.command
 
 import io.reactivex.Observable
 import io.reactivex.ObservableSource

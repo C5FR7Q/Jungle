@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 version '1.0' // your library version
-group 'com.c5fr7q' // whatever group name you'd like
+group 'com.github.c5fr7q' // whatever group name you'd like
 
 publishing {
 	publications {
@@ -45,7 +45,7 @@ bintray {
 	publish = true
 	pkg {
 		repo = 'Jungle' // the name of the repository you created on Bintray
-		name = 'com.c5fr7q.jungle'
+		name = 'com.github.c5fr7q.jungle'
 		version {
 			name = this.version
 			released = new Date()

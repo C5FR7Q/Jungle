@@ -1,6 +1,6 @@
-package com.c5fr7q.jungle
+package com.github.c5fr7q.jungle
 
-import com.c5fr7q.jungle.command.*
+import com.github.c5fr7q.jungle.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable

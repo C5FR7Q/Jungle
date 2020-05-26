@@ -1,8 +1,8 @@
 package com.example.myapplication.app.screen.demo
 
-import com.c5fr7q.jungle.command.Command
-import com.c5fr7q.jungle.command.CommandResult
-import com.c5fr7q.jungle.command.Middleware
+import com.github.c5fr7q.jungle.command.Command
+import com.github.c5fr7q.jungle.command.CommandResult
+import com.github.c5fr7q.jungle.command.Middleware
 import com.example.domain.country.Country
 import com.example.domain.country.GetCountriesInteractor
 import io.reactivex.Observable

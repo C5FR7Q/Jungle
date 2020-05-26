@@ -1,4 +1,4 @@
-package com.c5fr7q.jungle.command
+package com.github.c5fr7q.jungle.command
 
 interface CommandResult {
 	object Nothing : CommandResult

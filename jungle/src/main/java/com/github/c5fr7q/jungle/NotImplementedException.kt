@@ -1,4 +1,4 @@
-package com.c5fr7q.jungle
+package com.github.c5fr7q.jungle
 
 import java.lang.Exception
 
