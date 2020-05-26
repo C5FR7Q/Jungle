@@ -1,6 +1,6 @@
-package com.example.myapplication.base.mvi
+package com.c5fr7q.jungle
 
-import com.example.myapplication.base.mvi.command.*
+import com.c5fr7q.jungle.command.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable

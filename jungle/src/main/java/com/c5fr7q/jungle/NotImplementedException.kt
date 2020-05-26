@@ -1,4 +1,4 @@
-package com.example.myapplication.base.mvi
+package com.c5fr7q.jungle
 
 import java.lang.Exception
 

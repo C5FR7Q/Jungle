@@ -1,12 +1,12 @@
 package com.example.myapplication.app.screen.demo.store
 
+import com.c5fr7q.jungle.Store
+import com.c5fr7q.jungle.command.Command
+import com.c5fr7q.jungle.command.CommandResult
 import com.example.myapplication.app.screen.demo.CountryMiddleware
 import com.example.myapplication.app.screen.demo.DemoAction
 import com.example.myapplication.app.screen.demo.DemoEvent
 import com.example.myapplication.app.screen.demo.DemoState
-import com.example.myapplication.base.mvi.Store
-import com.example.myapplication.base.mvi.command.Command
-import com.example.myapplication.base.mvi.command.CommandResult
 import io.reactivex.Scheduler
 import javax.inject.Inject
 import javax.inject.Named

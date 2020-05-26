@@ -1,4 +1,4 @@
-package com.example.myapplication.base.mvi.command
+package com.c5fr7q.jungle.command
 
 import io.reactivex.Observable
 import io.reactivex.ObservableSource

@@ -1,4 +1,4 @@
-rootProject.name='My Application'
 include ':presentation'
 include ':data'
 include ':domain'
+include ':jungle'

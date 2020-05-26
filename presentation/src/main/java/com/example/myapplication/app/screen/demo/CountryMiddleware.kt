@@ -1,10 +1,10 @@
 package com.example.myapplication.app.screen.demo
 
+import com.c5fr7q.jungle.command.Command
+import com.c5fr7q.jungle.command.CommandResult
+import com.c5fr7q.jungle.command.Middleware
 import com.example.domain.country.Country
 import com.example.domain.country.GetCountriesInteractor
-import com.example.myapplication.base.mvi.command.Command
-import com.example.myapplication.base.mvi.command.CommandResult
-import com.example.myapplication.base.mvi.command.Middleware
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import javax.inject.Inject
