@@ -46,6 +46,7 @@ bintray {
 		repo = 'Jungle' // the name of the repository you created on Bintray
 		name = 'jungle'
 		licenses = ['Apache-2.0']
+		websiteUrl = 'https://github.com/C5FR7Q/Jungle'
 		vcsUrl = 'https://github.com/C5FR7Q/Jungle.git'
 		version {
 			name = this.version
