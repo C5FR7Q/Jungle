@@ -30,13 +30,18 @@ Maven:
 </dependency>
 ```
 
+### Base vokabulary
+* **State** - an entity, that contains data about persistent part of UI.
+* **Action** - an entity, that contains data about unstable part of UI.
+* **Event** - an ***Intent*** of user.
+
 ### Base classes
-* A
-* B
-* C
+* **Store** - this is where the magic is. Analogue of Presenter from MVP. Middleman between Model and View.
+* **Middleware** - a middleman between ***one*** functionality of business logic and UI.
+* **MviView** - a View from MVI. An interface, that contains two methods for dealing with ***actions*** and ***states***.
 
 ### Under the hood
-![alt text](https://www.meme-arsenal.com/memes/11fd9bc47e1794457c9904f1ecaf96ac.jpg)
+![alt text](Diagram.png)
 
 ## Usage examples
 * A
