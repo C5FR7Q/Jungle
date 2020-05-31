@@ -44,9 +44,12 @@ Maven:
 ![alt text](Diagram.png)
 
 ## Usage examples
-* A
-* B
-* C
+1. [Creating first store](https://github.com/C5FR7Q/Jungle/wiki/Creating-first-Store)
+2. [Dispatching events](https://github.com/C5FR7Q/Jungle/wiki/Dispatching-events)
+3. [Dealing with Middleware](https://github.com/C5FR7Q/Jungle/wiki/Dealing-with-Middleware)
+4. [Producing States](https://github.com/C5FR7Q/Jungle/wiki/Producing-States)
+5. [Producing Actions](https://github.com/C5FR7Q/Jungle/wiki/Producing-Actions)
+6. [What to use, State or Action?](https://github.com/C5FR7Q/Jungle/wiki/What-to-use,-State-or-Action%3F)
 
 ## Articles
 Will be soon
