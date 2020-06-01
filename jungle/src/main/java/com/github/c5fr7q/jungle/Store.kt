@@ -17,8 +17,7 @@ abstract class Store<Event, State, Action>(
 	private val states = BehaviorSubject.create<State>()
 	private val actions = PublishSubject.create<Action>()
 
-	private val lifeCycleSubscriptions = CompositeDisposable()
-	private val processCommandsSubscriptions = CompositeDisposable()
+	private val subscriptions = CompositeDisposable()
 
 	private var attached = false
 
@@ -34,7 +33,7 @@ abstract class Store<Event, State, Action>(
 
 	fun dispatchEventSource(eventSource: Observable<Event>) {
 		if (attached) {
-			lifeCycleSubscriptions.add(
+			subscriptions.add(
 				eventSource.observeOn(foregroundScheduler).subscribe { event ->
 					try {
 						val command = convertEvent(event)
@@ -52,7 +51,7 @@ abstract class Store<Event, State, Action>(
 		commands.let { bootstrapCommandsSource.mergeWith(it) ?: it }
 			.subscribeOn(backgroundScheduler)
 			.subscribe(commandSourceSubject)
-		processCommandsSubscriptions.add(
+		subscriptions.add(
 			commandSourceSubject.subscribe { command ->
 				produceAction(command)?.let { actions.onNext(it) }
 			}
@@ -62,7 +61,7 @@ abstract class Store<Event, State, Action>(
 			executeCommands(commandSourceSubject, states),
 			commandSourceSubject.ofType(CommandCommandResult::class.java)
 		).subscribe(commandResultSourceSubject)
-		processCommandsSubscriptions.add(
+		subscriptions.add(
 			commandResultSourceSubject.subscribe { commandResult ->
 				produceCommand(commandResult)?.let { commands.onNext(it) }
 			}
@@ -72,25 +71,24 @@ abstract class Store<Event, State, Action>(
 				states.onNext(initialState)
 			}
 			val initState = states.value!!
-			processCommandsSubscriptions.add(
+			subscriptions.add(
 				commandResultSourceSubject.scan(initState, { state, commandResult -> reduceCommandResult(state, commandResult) })
 					.distinctUntilChanged()
 					.subscribe { states.onNext(it) }
 			)
 		} catch (ignored: NotImplementedException) {
 		}
-		lifeCycleSubscriptions.add(
+		subscriptions.add(
 			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
 		)
-		lifeCycleSubscriptions.add(
+		subscriptions.add(
 			actions.observeOn(foregroundScheduler).subscribe { view.processAction(it) }
 		)
 		attached = true
 	}
 
 	fun detach() {
-		lifeCycleSubscriptions.dispose()
-		processCommandsSubscriptions.dispose()
+		subscriptions.dispose()
 		attached = false
 	}
 
