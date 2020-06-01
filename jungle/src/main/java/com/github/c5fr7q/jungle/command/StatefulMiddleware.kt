@@ -9,13 +9,15 @@ abstract class StatefulMiddleware<Input : Command, State> : ObservableTransforme
 	private var state: Observable<State> = Observable.empty()
 
 	override fun apply(upstream: Observable<Command>) = upstream.ofType(inputType)
-		.compose { transform(it.withLatestFrom(state, BiFunction<Input, State, Pair<Input, State>> { t1, t2 -> t1 to t2 })) }
+		.compose { transform(it.withLatestFrom(state, BiFunction<Input, State, CommandState> { t1, t2 -> CommandState(t1, t2) })) }
 
 	abstract val inputType: Class<Input>
 
-	abstract fun transform(upstream: Observable<Pair<Input, State>>): ObservableSource<CommandResult>
+	abstract fun transform(upstream: Observable<CommandState>): ObservableSource<CommandResult>
 
 	fun attachState(state: Observable<State>) {
 		this.state = state
 	}
+
+	inner class CommandState(val command: Input, val state: State)
 }
