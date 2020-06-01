@@ -16,7 +16,7 @@ class CountryMiddleware @Inject constructor(
 
 	override fun transform(upstream: Observable<Input>): ObservableSource<CommandResult> {
 		return upstream.switchMap {
-			getCountriesInteractor.countries
+			getCountriesInteractor.execute()
 				.map<Output> {
 					Output.Loaded(
 						it
