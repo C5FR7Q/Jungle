@@ -1,10 +1,10 @@
 package com.example.myapplication.app.screen.demo
 
+import com.example.domain.country.Country
+import com.example.domain.country.GetCountriesInteractor
 import com.github.c5fr7q.jungle.command.Command
 import com.github.c5fr7q.jungle.command.CommandResult
 import com.github.c5fr7q.jungle.command.Middleware
-import com.example.domain.country.Country
-import com.example.domain.country.GetCountriesInteractor
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import javax.inject.Inject
@@ -14,22 +14,13 @@ class CountryMiddleware @Inject constructor(
 ) : Middleware<CountryMiddleware.Input>() {
 	override val inputType = Input::class.java
 
-	override fun transform(upstream: Observable<Input>): ObservableSource<CommandResult> {
-		return upstream.switchMap {
+	override fun transform(upstream: Observable<Input>): ObservableSource<CommandResult> =
+		upstream.switchMap {
 			getCountriesInteractor.execute()
-				.map<Output> {
-					Output.Loaded(
-						it
-					)
-				}
-				.onErrorReturn {
-					Output.Failed(
-						it.message ?: "Can't load countries"
-					)
-				}
+				.map<Output> { Output.Loaded(it) }
+				.onErrorReturn { Output.Failed(it.message ?: "Can't load countries") }
 				.startWith(Output.Loading)
 		}
-	}
 
 	object Input : Command
 
