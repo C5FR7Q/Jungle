@@ -52,7 +52,7 @@ abstract class Store<Event, State, Action>(
 			.subscribeOn(backgroundScheduler)
 			.subscribe(commandSourceSubject)
 		subscriptions.add(
-			commandSourceSubject.subscribe { command ->
+			commandSourceSubject.observeOn(foregroundScheduler).subscribe { command ->
 				produceAction(command)?.let { actions.onNext(it) }
 			}
 		)
