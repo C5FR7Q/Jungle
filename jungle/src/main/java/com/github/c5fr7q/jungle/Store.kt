@@ -47,47 +47,26 @@ abstract class Store<Event, State, Action>(
 	}
 
 	fun attach(view: MviView<State, Action>) {
-		launch()
-		lifeCycleSubscriptions.add(
-			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
-		)
-		lifeCycleSubscriptions.add(
-			actions.observeOn(foregroundScheduler).subscribe { view.processAction(it) }
-		)
-		attached = true
-	}
-
-	fun detach() {
-		lifeCycleSubscriptions.dispose()
-		attached = false
-		finish()
-	}
-
-	fun launch() {
 		val bootstrapCommandsSource = Observable.fromIterable(bootstrapCommands)
 		val commandSourceSubject: ReplaySubject<Command> = ReplaySubject.create()
 		commands.let { bootstrapCommandsSource.mergeWith(it) ?: it }
 			.subscribeOn(backgroundScheduler)
 			.subscribe(commandSourceSubject)
-
 		processCommandsSubscriptions.add(
 			commandSourceSubject.subscribe { command ->
 				produceAction(command)?.let { actions.onNext(it) }
 			}
 		)
-
 		val commandResultSourceSubject: ReplaySubject<CommandResult> = ReplaySubject.create()
 		Observable.merge(
 			executeCommands(commandSourceSubject, states),
 			commandSourceSubject.ofType(CommandCommandResult::class.java)
 		).subscribe(commandResultSourceSubject)
-
 		processCommandsSubscriptions.add(
 			commandResultSourceSubject.subscribe { commandResult ->
 				produceCommand(commandResult)?.let { commands.onNext(it) }
 			}
 		)
-
 		try {
 			if (!states.hasValue()) {
 				states.onNext(initialState)
@@ -100,10 +79,19 @@ abstract class Store<Event, State, Action>(
 			)
 		} catch (ignored: NotImplementedException) {
 		}
+		lifeCycleSubscriptions.add(
+			states.observeOn(foregroundScheduler).subscribe { view.render(it) }
+		)
+		lifeCycleSubscriptions.add(
+			actions.observeOn(foregroundScheduler).subscribe { view.processAction(it) }
+		)
+		attached = true
 	}
 
-	fun finish() {
+	fun detach() {
+		lifeCycleSubscriptions.dispose()
 		processCommandsSubscriptions.dispose()
+		attached = false
 	}
 
 	protected open fun convertEvent(event: Event): Command = throw NotImplementedException()
