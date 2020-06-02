@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-version '1.1.0' // your library version
+version '1.1.1' // your library version
 group 'com.github.c5fr7q' // whatever group name you'd like
 
 task sourceJar(type: Jar) {
