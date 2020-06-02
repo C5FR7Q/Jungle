@@ -18,14 +18,14 @@ Advantages of this lib:
 ### Download
 Gradle:
 ```groovy
-implementation 'com.github.c5fr7q:jungle:1.0.0'
+implementation 'com.github.c5fr7q:jungle:1.1.1'
 ```
 Maven:
 ```xml
 <dependency>
   <groupId>com.github.c5fr7q</groupId>
   <artifactId>jungle</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.1</version>
   <type>pom</type>
 </dependency>
 ```
