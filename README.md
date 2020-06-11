@@ -52,5 +52,5 @@ Maven:
 6. [What to use, State or Action?](https://github.com/C5FR7Q/Jungle/wiki/What-to-use,-State-or-Action%3F)
 
 ## Articles
-Will be soon
+* [Dealing with MVI in simple structured way](https://medium.com/@qwe2rty1/dealing-with-mvi-in-simple-structured-way-febdd4b42d71)
 
