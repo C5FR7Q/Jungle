@@ -12,8 +12,6 @@ import javax.inject.Inject
 class CountryMiddleware @Inject constructor(
 	private val getCountriesInteractor: GetCountriesInteractor
 ) : Middleware<CountryMiddleware.Input>() {
-	override val inputType = Input::class.java
-
 	override fun transform(upstream: Observable<Input>): ObservableSource<CommandResult> =
 		upstream.switchMap {
 			getCountriesInteractor.execute()
